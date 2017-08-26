@@ -16,8 +16,10 @@ public class ArrayLocation {
 		coords[0] = 32.9;
 		coords[1] = -117.2;
 		System.out.println(accra.coords[0]);
-		System.out.println(accra.coords[1]);
 
 	}
+
+
+	
 
 }

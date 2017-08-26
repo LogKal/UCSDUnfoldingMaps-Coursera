@@ -3,9 +3,11 @@ package module1;
 import processing.core.PApplet;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
+import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
+import de.fhpotsdam.unfolding.providers.Microsoft;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 
 /** HelloWorld
@@ -46,7 +48,9 @@ public class HelloWorld extends PApplet
 		this.background(200, 200, 200);
 		
 		// Select a map provider
-		AbstractMapProvider provider = new Google.GoogleTerrainProvider();
+		//AbstractMapProvider provider = new Google.GoogleTerrainProvider();
+		AbstractMapProvider provider = new Microsoft.AerialProvider();
+
 		// Set a zoom level
 		int zoomLevel = 10;
 		
@@ -76,6 +80,17 @@ public class HelloWorld extends PApplet
 		
 		// TODO: Add code here that creates map2 
 		// Then you'll modify draw() below
+		Location dallas = new Location(32.7767f, -96.797f);
+		SimplePointMarker dallasPin = new SimplePointMarker(dallas);
+		dallasPin.setColor(color(255, 0, 0, 100));
+		dallasPin.setStrokeColor(color(255,0,0));
+		dallasPin.setStrokeWeight(3);
+		map2 = new UnfoldingMap(this, 400, 50, 350, 500, provider);
+	    map2.zoomAndPanTo(zoomLevel, dallas);
+	    map2.addMarker(dallasPin);
+	    MapUtils.createDefaultEventDispatcher(this, map2);
+		
+		
 
 	}
 
@@ -84,6 +99,7 @@ public class HelloWorld extends PApplet
 		// So far we only draw map1...
 		// TODO: Add code so that both maps are displayed
 		map1.draw();
+		map2.draw();
 	}
 
 	
