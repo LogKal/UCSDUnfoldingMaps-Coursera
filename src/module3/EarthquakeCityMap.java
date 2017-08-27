@@ -12,10 +12,14 @@ import processing.core.PApplet;
 //Unfolding libraries
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.marker.Marker;
+import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
+import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
+import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
+import de.fhpotsdam.unfolding.providers.Microsoft;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 
 //Parsing library
@@ -58,27 +62,39 @@ public class EarthquakeCityMap extends PApplet {
 		    earthquakesURL = "2.5_week.atom"; 	// Same feed, saved Aug 7, 2015, for working offline
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 700, 500, new Google.GoogleMapProvider());
+			//map = new UnfoldingMap(this, 200, 50, 700, 500, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, 200, 50, 700, 500, new Microsoft.AerialProvider());
+
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 			//earthquakesURL = "2.5_week.atom";
 		}
 		
 	    map.zoomToLevel(2);
 	    MapUtils.createDefaultEventDispatcher(this, map);	
-			
-	    // The List you will populate with new SimplePointMarkers
-	    List<Marker> markers = new ArrayList<Marker>();
+		Location valLoc = new Location(-38.14f, -73.03f);
+		Feature valEq = new PointFeature(valLoc);
+		valEq.addProperty("title", "Caldivia, Chile");
+		
+		Marker val = new SimplePointMarker(valLoc, valEq.getProperties());
 
+		map.addMarker(val);
+	    
+		// The List you will populate with new SimplePointMarkers
+	    List<Marker> markers = new ArrayList<Marker>();
 	    //Use provided parser to collect properties for each earthquake
 	    //PointFeatures have a getLocation method
 	    List<PointFeature> earthquakes = ParseFeed.parseEarthquake(this, earthquakesURL);
-	    
-	    //TODO (Step 3): Add a loop here that calls createMarker (see below) 
+	    //TODO (Step 3): Add a loop here that calls createMarker (see below)
 	    // to create a new SimplePointMarker for each PointFeature in 
 	    // earthquakes.  Then add each new SimplePointMarker to the 
 	    // List markers (so that it will be added to the map in the line below)
+	    for(PointFeature eq: earthquakes) {
+	    	System.out.println(eq.getLocation() +" "+ eq.getProperties());
+	    	markers.add(createMarker(eq));
+	    	//markers.add(new SimplePointMarker(eq.getLocation(), eq.getProperties()));
+	    }
 	    
-	    
+
 	    // Add the markers to the map so that they are displayed
 	    map.addMarkers(markers);
 	}
@@ -108,7 +124,20 @@ public class EarthquakeCityMap extends PApplet {
 		// Here is an example of how to use Processing's color method to generate 
 	    // an int that represents the color yellow.  
 	    int yellow = color(255, 255, 0);
-		
+		int red = color(255,0,0);
+	    int blue = color(0,0,255);
+		if(mag >= THRESHOLD_MODERATE) {
+	    	marker.setColor(red);
+	    	marker.setRadius(15);
+		}
+	    else if(mag > THRESHOLD_LIGHT && mag < THRESHOLD_MODERATE){
+	    	marker.setColor(yellow);
+	    	marker.setRadius(10);
+	    }
+	    else {
+	    	marker.setColor(blue);
+	    	marker.setRadius(5);
+	    }
 		// TODO (Step 4): Add code below to style the marker's size and color 
 	    // according to the magnitude of the earthquake.  
 	    // Don't forget about the constants THRESHOLD_MODERATE and 
@@ -123,7 +152,7 @@ public class EarthquakeCityMap extends PApplet {
 	}
 	
 	public void draw() {
-	    background(10);
+	    background(220);
 	    map.draw();
 	    addKey();
 	}
@@ -133,7 +162,30 @@ public class EarthquakeCityMap extends PApplet {
 	// TODO: Implement this method to draw the key
 	private void addKey() 
 	{	
+		int startX = 25;
+		int startY = 50;
+		int sizeX = 150;
+		int sizeY = 150;
+		
+		fill(255);
+		rect(startX,startY,sizeX,sizeY);
+		
+		fill(50);
+		text("Magnitude Key", (startX+sizeX)/3 ,(startY+sizeY)/3 );
+		text("> " + THRESHOLD_MODERATE + " = ", (startX+sizeX)/4+20 ,(startY+sizeY)/3 + 30);
+		text("> " + THRESHOLD_LIGHT + " = " , (startX+sizeX)/4+20 ,(startY+sizeY)/3 + 60);
+		text( THRESHOLD_LIGHT + "<  = " , (startX+sizeX)/4+20 ,(startY+sizeY)/3 + 90);
+
+		fill(255,0,0);
+		ellipse((startX+sizeX)/2 + 40,(startY+sizeY)/3 + 25,20,20);
+		fill(255,255,0);
+		ellipse((startX+sizeX)/2 + 40,(startY+sizeY)/3 + 55 ,15,15);
+		fill(0,0,255);
+		ellipse((startX+sizeX)/2 + 40,(startY+sizeY)/3 + 85 ,10,10);
+
+		
+		
 		// Remember you can use Processing's graphics methods here
-	
+		
 	}
 }
